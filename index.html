@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>마음 기록장</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&display=swap');
+  :root{--bg:#f4efe6;--paper:#fffdf8;--ink:#3a342b;--soft:#8a8073;--line:#e6ddcd;--accent:#b9543f;--accent-soft:#d99a86;--shadow:rgba(80,66,45,0.10);}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  html,body{background:var(--bg);}
+  body{font-family:'Gowun Batang',serif;color:var(--ink);line-height:1.85;padding:0 0 130px;max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background-image:radial-gradient(circle at 20% 30%,rgba(0,0,0,0.015) 1px,transparent 1px),radial-gradient(circle at 70% 60%,rgba(0,0,0,0.015) 1px,transparent 1px);background-size:24px 24px,32px 32px;}
+  header{text-align:center;padding:48px 24px 28px;position:relative;z-index:1;}
+  header .ko{font-size:30px;font-weight:700;letter-spacing:.18em;color:var(--ink);}
+  header .line{width:46px;height:2px;background:var(--accent);margin:18px auto 16px;opacity:.7;}
+  header .sub{font-family:'Gowun Dodum',sans-serif;font-size:13px;color:var(--soft);letter-spacing:.04em;line-height:1.7;}
+  .composer{position:relative;z-index:1;margin:8px 18px 30px;background:var(--paper);border:1px solid var(--line);border-radius:18px;box-shadow:0 6px 22px var(--shadow);overflow:hidden;}
+  .composer .now{font-family:'Gowun Dodum',sans-serif;font-size:12.5px;color:var(--accent);padding:14px 20px 0;letter-spacing:.03em;}
+  textarea{width:100%;border:none;outline:none;resize:none;background:transparent;font-family:'Gowun Batang',serif;font-size:16.5px;line-height:1.9;color:var(--ink);padding:10px 20px 8px;min-height:120px;}
+  textarea::placeholder{color:#c3baa9;}
+  .emolabel{font-family:'Gowun Dodum',sans-serif;font-size:11.5px;color:var(--soft);padding:6px 20px 0;}
+  .emos{display:flex;flex-wrap:wrap;gap:6px;padding:6px 16px 10px;}
+  .emo{font-family:'Gowun Dodum',sans-serif;font-size:12.5px;border:1px solid var(--line);background:#fff;color:var(--soft);padding:6px 11px;border-radius:14px;cursor:pointer;user-select:none;transition:all .15s;}
+  .emo.on{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .emo .n{font-size:10px;opacity:.7;margin-right:3px;}
+  .datebar{display:flex;align-items:center;gap:8px;padding:0 20px 12px;font-family:'Gowun Dodum',sans-serif;font-size:12px;color:var(--soft);flex-wrap:wrap;}
+  .datebar label{display:flex;align-items:center;gap:6px;cursor:pointer;}
+  .datebar input[type=checkbox]{width:15px;height:15px;accent-color:var(--accent);}
+  .datebar input[type=datetime-local]{font-family:'Gowun Dodum',sans-serif;font-size:12.5px;border:1px solid var(--line);border-radius:8px;padding:5px 8px;color:var(--ink);background:#fff;}
+  .composer .bar{display:flex;justify-content:space-between;align-items:center;padding:10px 16px 14px;border-top:1px solid var(--line);}
+  .hint{font-family:'Gowun Dodum',sans-serif;font-size:11.5px;color:var(--soft);}
+  button.primary{font-family:'Gowun Dodum',sans-serif;border:none;cursor:pointer;border-radius:11px;font-size:14px;padding:10px 22px;background:var(--accent);color:#fff;letter-spacing:.06em;}
+  button.primary:active{transform:scale(.96);}
+  .entries{position:relative;z-index:1;padding:0 18px;}
+  .entry{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:20px 22px 22px;margin-bottom:16px;box-shadow:0 4px 16px var(--shadow);position:relative;animation:rise .5s ease both;}
+  @keyframes rise{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+  .entry .date{font-family:'Gowun Dodum',sans-serif;font-size:12.5px;color:var(--accent);letter-spacing:.05em;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+  .entry .date::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent-soft);display:inline-block;flex:none;}
+  .entry .body{font-size:16px;line-height:1.95;white-space:pre-wrap;word-break:break-word;}
+  .entry .tags{margin-top:12px;display:flex;flex-wrap:wrap;gap:5px;}
+  .entry .tag{font-family:'Gowun Dodum',sans-serif;font-size:11.5px;background:#f7efe5;color:var(--accent);padding:3px 9px;border-radius:11px;border:1px solid var(--accent-soft);}
+  .entry .acts{position:absolute;top:13px;right:12px;display:flex;gap:2px;}
+  .entry .acts button{background:none;color:#ccbfa9;font-size:15px;padding:4px 7px;border-radius:8px;border:none;cursor:pointer;}
+  .entry .acts button:active{color:var(--accent);}
+  .empty{text-align:center;color:var(--soft);font-family:'Gowun Dodum',sans-serif;font-size:14px;padding:40px 20px;line-height:1.8;}
+  .tools{position:fixed;bottom:0;left:0;right:0;z-index:5;display:flex;gap:6px;justify-content:center;padding:14px 12px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--bg) 70%,transparent);max-width:720px;margin:0 auto;}
+  .tools button{background:#fff;color:var(--accent);border:1px solid var(--accent-soft);flex:1;font-size:12px;padding:12px 4px;border-radius:11px;font-family:'Gowun Dodum',sans-serif;cursor:pointer;}
+  .count{text-align:center;font-family:'Gowun Dodum',sans-serif;font-size:12px;color:var(--soft);margin:6px 0 22px;position:relative;z-index:1;}
+  .modal{position:fixed;inset:0;background:rgba(58,52,43,0.55);z-index:20;display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 10px;}
+  .modal.on{display:flex;}
+  .sheet{background:var(--paper);border-radius:18px;max-width:680px;width:100%;padding:24px 18px 22px;position:relative;box-shadow:0 12px 40px rgba(0,0,0,0.2);}
+  .sheet h2{font-size:18px;font-weight:700;text-align:center;margin-bottom:6px;}
+  .sheet .week{font-family:'Gowun Dodum',sans-serif;font-size:12.5px;color:var(--soft);text-align:center;margin-bottom:14px;}
+  .weekNav{display:flex;justify-content:center;gap:8px;margin-bottom:16px;}
+  .weekNav button{font-family:'Gowun Dodum',sans-serif;font-size:12px;background:#fff;border:1px solid var(--line);padding:6px 12px;border-radius:8px;color:var(--ink);cursor:pointer;}
+  .sumtable,.gridtable{width:100%;border-collapse:collapse;font-family:'Gowun Dodum',sans-serif;font-size:11.5px;}
+  .sumtable th,.sumtable td,.gridtable th,.gridtable td{border:1px solid var(--line);padding:5px 3px;text-align:center;}
+  .sumtable th{background:#f3e7e0;color:var(--ink);font-weight:400;line-height:1.3;}
+  .sumtable td{background:#fdf6f1;font-weight:700;color:var(--accent);font-size:13px;}
+  .gridtable{margin-top:14px;}
+  .gridtable th{background:#e3eaf2;color:var(--ink);font-weight:400;}
+  .gridtable td.day{background:#e3eaf2;color:var(--ink);}
+  .gridtable td{min-width:28px;color:var(--ink);font-size:11px;line-height:1.4;}
+  .gridtable td.empty{color:#ccc;}
+  .closeBtn{position:absolute;top:10px;right:12px;background:none;border:none;font-size:22px;color:#aaa;cursor:pointer;}
+  .legend{font-family:'Gowun Dodum',sans-serif;font-size:11px;color:var(--soft);text-align:center;margin-top:12px;line-height:1.6;}
+</style>
+</head>
+<body>
+  <header>
+    <div class="ko">마음 기록장</div>
+    <div class="line"></div>
+    <div class="sub">너는 지금 작지만 이미 크다<br>너의 때가 오고 있다</div>
+  </header>
+  <div class="composer">
+    <div class="now" id="now"></div>
+    <textarea id="input" placeholder="오늘의 마음을 그대로 적어보세요…"></textarea>
+    <div class="emolabel">이 순간의 감정 (여러 개 선택 가능)</div>
+    <div class="emos" id="emos"></div>
+    <div class="datebar">
+      <label><input type="checkbox" id="useCustom"> 지난 날짜로 기록</label>
+      <input type="datetime-local" id="customDate" style="display:none">
+    </div>
+    <div class="bar">
+      <span class="hint">쓴 그대로, 날짜는 자동으로 기록돼요</span>
+      <button class="primary" id="btnAdd">기록</button>
+    </div>
+  </div>
+  <div class="count" id="count"></div>
+  <div class="entries" id="entries"></div>
+  <div class="tools">
+    <button id="btnMatrix">감정 매트릭스</button>
+    <button id="btnExport">백업 내보내기</button>
+    <button id="btnImport">불러오기</button>
+    <button id="btnReset">원본 복원</button>
+  </div>
+  <input type="file" id="file" accept=".json,.txt" style="display:none">
+  <div class="modal" id="modal">
+    <div class="sheet">
+      <button class="closeBtn" id="btnCloseMatrix">×</button>
+      <h2>이번 주 감정 매트릭스</h2>
+      <div class="week" id="weekLabel"></div>
+      <div class="weekNav">
+        <button data-w="-1">‹ 이전 주</button>
+        <button data-w="0">이번 주</button>
+        <button data-w="1">다음 주 ›</button>
+      </div>
+      <div id="matrixBody"></div>
+      <div class="legend">
+        1. 怒 성냄 &nbsp; 2. 喜 기쁨 &nbsp; 3. 悲 슬픔 &nbsp; 4. 恐 두려움<br>
+        5. 驚 놀람 &nbsp; 6. 思 생각 &nbsp; 7. 憂 근심
+      </div>
+    </div>
+  </div>
+<script>
+(function(){
+  var KEY='maum_journal_v4';
+  var entries=[];
+  var SEED=[{"id": "seed-20251027", "ts": "2025-10-27T21:00:00", "text": "나는 나를 쇄뇌시킨다.\n괜찮다고, 과거가 그저 잠깐 생각난것뿐이라고,\n새롭게 발생할 일이 아니라고\n너는 지금 너자리를 지키면 된다고\n잠시 답답함은 자유를 맛보았기 때문이라고.\n나는 끊임없이 말한다.\n이게 맞는지 안맞는지는 중요하지 않다.\n그저.. 책임과 생각의 무게가 다른 모든것을 압도하길 바란다.\\"}, {"id": "seed-20251122", "ts": "2025-11-22T21:00:00", "text": "너는 작은 솔씨 하나지만\n네 안에는 아름드리 금강송이 있다.\n\n너는 작은 도토리알이지만\n네 안에는 우람한 참나무가 들어있다.\n\n너는 작은 보리 한 줌이지만\n네 안에는 푸른 보리밭이 숨쉬고 있다.\n\n너는 지금 작지만\n너는 이미 크다.\n\n너는 지금 모르지만\n너의 때가 오고 있다.\n\n-박노해-"}, {"id": "seed-20251202", "ts": "2025-12-02T21:00:00", "text": "상대가 원하는 대답을 해줄것\n다만 예측가능 범위를 살짝 넘을것\n유쾌할것"}, {"id": "seed-20251208", "ts": "2025-12-08T21:00:00", "text": "세월이 흐르는 가운데서도 묵묵히 스스로 삶을 돌보고, 음식을 나르고, 생명을 살리고, 마음을 품어내는 여자들을 보면서 깨달았어. \n\n 여성성은 젊음의 장식이 아니라 존재가 생명력을 발휘하는 방식이라는 것을.\n\n 외형을 가꾸는 기쁨도 여성성이고, 보이지 않는 감각과직관을 다시 마주하는 것도 여성성이야. \n\n 우리는 각자의 속도로, 각자의 방식으로 아름다워진다.\n\n그래서 나는 여성성을 회복하는 여정을 말하려 해.\n나 자신의 감각을 되찾고, 여성 각자의 미(美)가 살아나는 길을 위해.\n\n 아직 서툴고 더디지만, 같이 걸어주면 좋겠어. \n꺼지지 않는 감각으로, 오래도록 여자답게."}, {"id": "seed-20251217", "ts": "2025-12-17T21:00:00", "text": "2025년 잘 한것\n\n1. 헬스를 도전한 것\n2. 자전거 타는것을 도전한 것\n3. 달리기를 한 것\n4. 책을 꾸준히 읽은 것\n5. 나의 불안우울패턴을 알게된 것 (결국 깊이 생각하고 단 하나의 아주 작은 근본을 찾아내야한다. 이번의 경우 욕심, 역시 욕심과 선택하지 못하는 나의 애매한 태도가 문제였다)\n6. 친절한 태도에 대해 깊이 이해한 것\n7. 내가 가진 기준으로 사람을 평가하지 않게된것. (온전히 한사람이 나에게 받아들여지는 경험은 굉장히 감동이다)\n\n\n\n2026년 하고싶은것.\n\n1. 수영을 배우겠다.\n2. 수영을 배워 어디든 물가에 들어가 자유롭게 수영하겠다.\n3. 기록하겠다.(나의 운동, 명상, 나아감에 관련된 모든것을 기록하겠다)\n4. 여행을 떠난다.(온전한 자유를 느끼는 여행)\n5. 명상공부를 한다. (이건 단순히 책을 읽는것이 아니다. 공부다! 깊은 이해와 암기가 필요하다!!)\n6. 헬스를 꾸준히한다 (가능하면 주 3회는 하고싶다)\n7. 독서모임을 만든다\n8. 뜨개모임"}, {"id": "seed-20260119", "ts": "2026-01-19T21:00:00", "text": "내가 나로 돌아간다는게 이런건줄 몰랐어 ㅎㅎ\n나도 참 우습다 ㅎㅎㅎ 진짜 ㅎㅎㅎㅎㅎㅎㅎㅎ\n나로 살기로 했다는게 무엇인지 몰라서 헤메었는데\n그시절 가장 흔들리던 나 였다니,\n이번에 인연, 관계 그리고 직장에서의 실수로 내 마음이 많이 아프고 흔들렸는데, 그 과정에서 과거의 내모습이 지금나에게 보였어.\n나는 여전하구나 싶으면서도 달라진건 내가 타인을 본다는거야.\n나와 연결되있음이 느껴지고 그들의 양면성 (힘듬과 좋음) 이 함께 느껴지고 그래서 과거의 나는 감정에 빠져 허우적 대었다면\n지금의 나역시 일렁이는 감정에 흔들리지만 상대를 같이 보게 되는... 아 뭐라고 설명해야할지 모르겠어."}, {"id": "seed-20260126", "ts": "2026-01-26T21:00:00", "text": "이상한 느낌, \n이달 말까지만 근무한다고 하자마자 온몸에 땀이 쭉 나면서 막혔던 코가 뻥 뚤리며 감기가 나은느낌\n그러면서 봄이 옴을 바로 몸이 실감했다.\n\n이게 뭐지. 무슨느낌이지.\n왜 그만둔다는데 ㅎㅎㅎㅎㅎ 이번주 운동이 마지막이라는데 이렇게 개운하지? 왜 봄이오는거같지??? 머리가 가볍고 왜그러지???"}, {"id": "seed-20260127", "ts": "2026-01-27T21:00:00", "text": "그런데 왜 나도 그만두고싶지?\n그만두고싶다기보단 새로 시작하고 싶어\n말 그대로 새로 시작하고 싶어\n막막 달리고싶어\n참 서투르고 섣부르지만 그냥 막 달리고싶어\n터져나와 내안에서\n다정한 인사, 안부, 변화, 이별, 시작, 모든게 내안에서 쏟아져나와서 굉장히 복잡하지만 정확이 뭔지도 모르겠지만 \n곧 이겠구나. 싶어"}, {"id": "seed-20260128", "ts": "2026-01-28T21:00:00", "text": "내가 정신못차리고있어감정으로 회피하지마.\n감정으로 더이상 회피하지마.\n현실로 돌아와서 수습해.\n잘못한건 잘못한거다.\n미안하다.\n정신차리고해.\n니가 영적으로 뭐고 하고싶더라도 지금 너의 책임을 다해\n네 자리는 회사고 그 자리에서 너의 일을 해.\n어줍잖게 애매하게 굴지마.\n그럴꺼면 그만두고 그냥 떠나!\n그게아니라면 너를 위해서 동료를 위해서 집중해"}, {"id": "seed-20260219", "ts": "2026-02-19T21:00:00", "text": "뭔가 울어버리고 싶은기분 그래도 그냥한다\n자책하고 매번 또하고 자책하고. \n입을 다물자"}, {"id": "seed-20260310", "ts": "2026-03-10T21:00:00", "text": "정신이 없다.\n정신이 없다기보다는 불안한건가 \n아니면 조금 짜증이난건가\n\n인스타 툰을 만들려고하는데, 처음인데 당연히 시간이 걸리는건데 마음이 조급해서 짜증이 나는듯하다.\n\n아이는 감기가 오래가고있는데, 갑자기 귀가 먹먹하다고 해서 퇴근후 급히 병원에 가봐야한다.\n\n일상적인 일이고 크게 안아픈게 참 다행인건데\n내마음이 조급하고 욕심을 내다보니, 모든게 꼬이고 꼬인것처럼 보인다.\n\n꼬인것은 하나도 없는데,, 역시 내 마음의 문제이며, 지금 내가 여유가 없다는 반증이 아닐까. \n그렇다면 해결책은!!!!\n\n1. 일단 집가서 연서와 병원에가고 따뜻한 저녁을 먹는다!!\n2. 집에가서 연서가 책보는동안 인스타 툰을 만든다!!!\n3. 인스타툰을 업로드 한다!!!!\n\n이러면 된다. 걱정할것없다.\n아이가 크게 안아픈게 어디인가.. 좀 쉬게 하자\n\n첫술에 배부르려하다니 욕심히과하다\n\n마음 편히, 단디먹고 쭈욱가자\n\n단발성아니다 이나라. 단디맘먹어라"}, {"id": "seed-20260404", "ts": "2026-04-04T21:00:00", "text": "회복한다는건 본래의 나로 돌아간다는것\n나는 상처를 안받는것일까?\n안받는다고 생각하는것일까?\n나는 마음이 고운것일까 그저 무심히 넘기는것일까 내가 그러려니 넘어가기에 상처를 잘 받지 않지만 그렇다고 나에게 상처를 주란말은 아니다."}, {"id": "seed-20260409", "ts": "2026-04-09T21:00:00", "text": "수영1 \n수영을 했다. 한 3개월, 아이가 수영수업 듣는동안 기다리다 어느새 나도 등록해서 함께했다.\n\n일주일에 한번\n개중에 생리때 빠지고 아파서 빠지고 일주일에 한번을 못가서 보강이 5번된다.\n\n첫 수영은 낯설었고, 생각보다 집중이 되지않았고 (헬스 무게칠때 더 집중되는 느낌) 다리가 아팠다. \n그 후로도 수영보단 헬스군!! 에 가까운 마음이 들었고\n킥판을 들고 음파 발차기를 할땐 이렇게 속도가 안난다고!!!!! 하는 마음이 들었다.\n그러다 그러다 어느새 3개월\n킥판잡고 하는 자유영\n그리고 맨손으로 하는 자유영\n그 어느것에도 의지하지 않고 물속에서 수영한다.\n몸은 이쪽저쪽 기우뚱 기우뚱 \n어깨를 쭉 뻗어 앞으로 나아간다\n나는 어떤 인생을 살게될것인가\n기우뚱 기우뚱 이쪽 저쪽 그러면서 앞으로 나아가겠지\n내가 기대된다."}, {"id": "seed-20260412", "ts": "2026-04-12T21:00:00", "text": "한때나를 움직였던 야망 욕망에 편지쓰기\n의무감 대신 매혹을\n전략대신 호기심을 따르자"}, {"id": "seed-20260415", "ts": "2026-04-15T21:00:00", "text": "두렵다는 감정 이순간의 감정 너무너무 귀한것 지나가버리는 것 츙뷴히 느끼고 만끽하자"}, {"id": "seed-20260420", "ts": "2026-04-20T21:00:00", "text": "다정함, 판단하지 않음, 난 여전히 판단중이고, 여전히 어렵다.\n판단하지 않을때에만 다정할 수 있구나."}, {"id": "seed-20260423", "ts": "2026-04-23T21:00:00", "text": "남편의 다정함\n아침에 일어나 출근준비를 한다.\n출근하던 중 배가 아파 차를 다시 집으로 돌렸다\n남편과 아이는 각자 등교와, 출근 준비중이었고, 그새 화장실에 들렀다 그들을 보았다.\n남편은 아이와 마주본 상태로 아이 옷 매무새를 다듬어주었다.\n그 모습이 다정해서 그들을 보고있을 수 밖에 없었다.\n저절로 미소가 나올 수 밖에 없었다.\n미소가 저절로 나오는 순간들에는 역시 다정함이있다.\n다정함, 따뜻함, 어우러짐 이 모든 순간들엔 미소가 저절로 스며든다. 나에게 다정함은 그저 내가 해야하는것을 하고 내가 할 수있는것을 하는것 이었는데 작은 손짓하나에도 다정할 수 있음을 이제 볼 수 있다는것에 감사한다. 모든 부분에서 다정함을 찾을 수 있음에 감사한다."}, {"id": "seed-20260506", "ts": "2026-05-06T21:00:00", "text": "어제 엄청 싸우고 서울에 간다.\n엄청 싸운이유는 나의 짜증이 비춰짐\n내가 짜증나는 이유는 건강 건강건강\n그놈의 건강ㅎㅎㅎ\n계속 계속 강조해오던것이 무너지는 경험\n그리고 원망하는 마음이 들어서이다.\n다치고 아픈 상대를 바라보는 마음보다\n내가 지키려했던  지키고자했던것이 무너지는 것을 보는게 더 마음이 쓰였기때문이다.\n그리고 안되는구나 깨달았기때문이다.\n결국 내 마음대로 되는건 나밖에 없고\n하기싫은 잔소리를 해대는것도 다 쓸모없는 짓이다 라는걸 알았기때문이다.\n잔소리하는거 생각보다 너무 힘든일이다\n너무 가까이도 멀리도 하지말라\n가까이하면 잔소리를 해대여 내 마음이 쓰이고 멀리하면 그것또한 그러하니 적당한 자리가 필요하구나. 나는 여태 인간관계에서 적당한 자리를 못찾았구나.\n나나 잘하자\n나나 잘해\n내 기억과 경험에 반복되는 행동을 하지말자"}, {"id": "seed-20260516", "ts": "2026-05-16T21:00:00", "text": "지금껏 살면서 나의 삶의 원동력은 불안함이었다. 불안함은 나를 움직이게했다. 회사에서도 바쁘게 일하면 뿌듯했고 하루종일 무언가를 하지않으면 스스로 괴로웠으며 어딘가에 소속되어 안정감을 느꼈다.\n퇴사를 한후 이주일이 지난지금 약간의 불안과 두려움이 나를 또 움직이게 만든다.\n내가 원하는 삶을 살겠노라고 큰소리치며 퇴사했는데 여전히 날 움직이는건 불안감이다.\n토요일 명상심리지도사 수업후 엄마와통화하는데 듣고있는 수업에 대해 처음말했고 늦은시간까지 고생한다는 엄마말에 아니야 나너무 즐거워 즐거워서 하는거야 라고 말하는 스스로를 목격한다.\n내가 즐거워서 한다고 말한적이있었던가.. 무언가를 해내서 결과에대한 만족으로 기쁨은 있었지만 즐거워서한다고 말한적이 있었던가.. 나에게 질문을 던진다.\n불안과 두려움 불확실성이 전화한통화에 명확해진다. 이 길이 맞구나.\n맞았어. 나는 이제 그냥 진짜 그냥 하면되는거구나."}, {"id": "seed-20260520", "ts": "2026-05-20T21:00:00", "text": "외로웠지만 슬프진 않았다. 혼자 결정하고 시작한 일이기에 외로움은 당연하다고 받아들인다. 그리고 잘해낼꺼라고 스스로 생각한다. 난 좋은 명상선생님이 될것이고, 그냥 뜨개하며 삶을 살아가는 사람이 될것이며, 책을 읽고 경험함으로 나를 채울것이다.  새로온 뜨개실의 색상이 너무 예뻐 행복하고, 우리 연서 우리 딸 중간에 간식챙겨줄 수 있어서 감격스러웠다. (계속 일하는 워킹맘이어서 아이를 챙겨줄 수 없었다.) 나도 아이도 남편도 항상 몸과 마음이 건강하고 충만하길, 오늘도 감사합니다."}, {"id": "seed-20260523", "ts": "2026-05-23T21:00:00", "text": "내가 단단해지고 싶었던건 그러면 사랑받을수 있을거라고 생각했어서야\n내가 다정하고싶었던것도 온전히 사랑받고 싶어서였어.\n20대의 나는 너무 흔들렸기에 사랑을 잃었다고 생각했어.모든게 나의 감정기복 내가 왜 이러는지 모르는 나 때문이라고 자책했어\n이런 나여도 나의 반짝임을 볼수있는 사람이 있었을텐데 그걸 몰랐어 다 내탓이라고 생각했어. 내가 부족해서라고 생각했어. 그리고 나도 모르는 나의 반짝임을 상대가 알아주고 나도 못믿는 나를 상대가 믿어주길 바랬어.\n그리고 상대가 그러지 못했을때 변했다고 책망하고 원망했어. 그래서 달라지고 싶었어 그래서 단단해지고 싶었어.\n시간이 흘러서 30대가 되서 나는 단단하다는 말을 주변인들을 통해 들었지만 여전히 나는 사랑받고싶었어. 상대의 사랑을 온전히 받아들이지 못하고 여전히 의심하고 책망했어.\n그래서 다정함을 갖고싶었던거야. 가지면 다 될것같아서.. 아 결론은 사랑이었던거야\n\n이렇게 돌고돌아 명상까지왔어\n나는 나를 더 알아가고있어.\n내 욕구 욕망을 솔직하게 말해도되는구나 알게되었어\n더이상 빙 둘러 얘기하지 않아도 되는구나 알게되었어.\n내가 추구하는 변화의기저에는 사랑이있었어\n사랑받고싶어서.. 온전히 사랑받는다는 느낌에 감싸이고 싶어서..\n이나라 너너너너 대단해!!!!! 고생했어 정말 !!!! 여기까지왔구나. 아!"}];
+  var EMOTIONS=[{n:1,name:'성냄',hanja:'怒'},{n:2,name:'기쁨',hanja:'喜'},{n:3,name:'슬픔',hanja:'悲'},{n:4,name:'두려움',hanja:'恐'},{n:5,name:'놀람',hanja:'驚'},{n:6,name:'생각',hanja:'思'},{n:7,name:'근심',hanja:'憂'}];
+  var selectedEmos=[];
+  var weekOffset=0;
+
+  function load(){
+    try{var raw=localStorage.getItem(KEY);
+      if(raw){var saved=JSON.parse(raw);
+        if(!Array.isArray(saved)||saved.length<SEED.length){entries=JSON.parse(JSON.stringify(SEED));save();}else{entries=saved;}
+      }else{entries=JSON.parse(JSON.stringify(SEED));save();}
+    }catch(e){entries=JSON.parse(JSON.stringify(SEED));}
+  }
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(entries));}catch(e){}}
+  function fmt(ts){var d=new Date(ts);var wk=['일','월','화','수','목','금','토'][d.getDay()];var h=d.getHours();var mi=String(d.getMinutes()).padStart(2,'0');var ap=h<12?'오전':'오후';var h12=h%12;if(h12===0)h12=12;return d.getFullYear()+'년 '+(d.getMonth()+1)+'월 '+d.getDate()+'일 ('+wk+') · '+ap+' '+h12+':'+mi;}
+  function tick(){if(!document.getElementById('useCustom').checked)document.getElementById('now').textContent=fmt(new Date().toISOString());}
+  function toggleDate(){var on=document.getElementById('useCustom').checked;var inp=document.getElementById('customDate');inp.style.display=on?'inline-block':'none';if(on){var d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());inp.value=d.toISOString().slice(0,16);document.getElementById('now').textContent='지난 날짜로 기록합니다';}else{tick();}}
+  function renderEmoButtons(){var box=document.getElementById('emos');box.innerHTML='';EMOTIONS.forEach(function(e){var b=document.createElement('button');b.className='emo';b.type='button';b.innerHTML='<span class="n">'+e.n+'</span>'+e.name;b.addEventListener('click',function(){var i=selectedEmos.indexOf(e.n);if(i>=0)selectedEmos.splice(i,1);else selectedEmos.push(e.n);b.classList.toggle('on');});box.appendChild(b);});}
+  function clearEmoSelection(){selectedEmos=[];document.querySelectorAll('.emo.on').forEach(function(b){b.classList.remove('on');});}
+  function render(){entries.sort(function(a,b){return new Date(b.ts)-new Date(a.ts);});var box=document.getElementById('entries'),cnt=document.getElementById('count');box.innerHTML='';if(entries.length===0){box.innerHTML='<div class="empty">아직 기록이 없어요.<br>첫 마음을 적어보세요 🌿</div>';cnt.textContent='';return;}cnt.textContent='기록 '+entries.length+'편';
+    entries.forEach(function(e){var div=document.createElement('div');div.className='entry';var tagsHtml='';
+      if(e.emos&&e.emos.length){var ts=e.emos.map(function(n){var em=EMOTIONS.find(function(x){return x.n===n;});return em?'<span class="tag">'+em.n+'. '+em.name+'</span>':'';}).join('');tagsHtml='<div class="tags">'+ts+'</div>';}
+      div.innerHTML='<div class="acts"><button title="날짜수정">✎</button><button title="감정수정">♡</button><button title="삭제">×</button></div><div class="date">'+fmt(e.ts)+'</div><div class="body"></div>'+tagsHtml;
+      div.querySelector('.body').textContent=e.text;
+      var btns=div.querySelectorAll('.acts button');
+      btns[0].addEventListener('click',function(){editDate(e.id);});
+      btns[1].addEventListener('click',function(){editEmos(e.id);});
+      btns[2].addEventListener('click',function(){del(e.id);});
+      box.appendChild(div);
+    });
+  }
+  function addEntry(){var t=document.getElementById('input'),v=t.value.trim();if(!v&&selectedEmos.length===0){alert('일기나 감정 중 하나는 적어주세요.');return;}
+    var ts;if(document.getElementById('useCustom').checked){var cv=document.getElementById('customDate').value;ts=cv?new Date(cv).toISOString():new Date().toISOString();}else{ts=new Date().toISOString();}
+    entries.push({id:'e-'+Date.now(),ts:ts,text:v,emos:selectedEmos.slice()});
+    save();render();t.value='';clearEmoSelection();document.getElementById('useCustom').checked=false;toggleDate();window.scrollTo({top:0,behavior:'smooth'});}
+  function editDate(id){var e=entries.find(function(x){return x.id===id;});if(!e)return;var cur=new Date(e.ts);cur.setMinutes(cur.getMinutes()-cur.getTimezoneOffset());var v=prompt('날짜·시간을 고치세요 (예: 2025-11-22 14:30)',cur.toISOString().slice(0,16).replace('T',' '));if(!v)return;var nd=new Date(v.replace(' ','T'));if(isNaN(nd)){alert('날짜 형식이 올바르지 않아요.');return;}e.ts=nd.toISOString();save();render();}
+  function editEmos(id){var e=entries.find(function(x){return x.id===id;});if(!e)return;var cur=(e.emos||[]).join(',');var v=prompt('감정 번호를 쉼표로 적어주세요 (예: 2,6)\n1.성냄 2.기쁨 3.슬픔 4.두려움 5.놀람 6.생각 7.근심',cur);if(v===null)return;var nums=v.split(',').map(function(s){return parseInt(s.trim());}).filter(function(n){return n>=1&&n<=7;});e.emos=nums;save();render();}
+  function del(id){if(!confirm('이 기록을 지울까요?'))return;entries=entries.filter(function(e){return e.id!==id;});save();render();}
+  function resetSeed(){if(!confirm('원본 기록으로 되돌릴까요?\n(지금 화면의 기록은 사라지니, 새로 쓴 게 있으면 먼저 백업하세요)'))return;entries=JSON.parse(JSON.stringify(SEED));save();render();alert('원본을 복원했어요.');}
+  function exportTxt(){var out='마음 기록장 — 백업\n\n';var sorted=entries.slice().sort(function(a,b){return new Date(a.ts)-new Date(b.ts);});
+    sorted.forEach(function(e){out+='───────────────────────\n'+fmt(e.ts)+'\n───────────────────────\n'+e.text;
+      if(e.emos&&e.emos.length){var names=e.emos.map(function(n){var em=EMOTIONS.find(function(x){return x.n===n;});return em?em.n+'.'+em.name:'';}).join(', ');out+='\n[감정] '+names;}out+='\n\n';});
+    var blob=new Blob(['\uFEFF'+out+'\n\n[DATA]\n'+JSON.stringify(entries)],{type:'text/plain;charset=utf-8'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);var d=new Date();a.download='마음기록장_'+d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')+'.txt';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);}
+  function importTxt(){document.getElementById('file').click();}
+  function getWeekRange(offset){var now=new Date();now.setHours(0,0,0,0);var dow=now.getDay();var monOffset=dow===0?-6:1-dow;var mon=new Date(now);mon.setDate(now.getDate()+monOffset+offset*7);var sun=new Date(mon);sun.setDate(mon.getDate()+6);sun.setHours(23,59,59,999);return {start:mon,end:sun};}
+  function timeSlot(date){var h=date.getHours();if(h>=7&&h<=8)return 0;if(h>=9&&h<=10)return 1;if(h>=11&&h<=12)return 2;if(h>=13&&h<=14)return 3;if(h>=15&&h<=16)return 4;if(h>=17&&h<=18)return 5;if(h>=19&&h<=20)return 6;if(h>=21&&h<=22)return 7;return -1;}
+  function openMatrix(){weekOffset=0;renderMatrix();document.getElementById('modal').classList.add('on');}
+  function closeMatrix(){document.getElementById('modal').classList.remove('on');}
+  function navWeek(n){if(n===0)weekOffset=0;else weekOffset+=n;renderMatrix();}
+  function renderMatrix(){var rng=getWeekRange(weekOffset);document.getElementById('weekLabel').textContent=(rng.start.getMonth()+1)+'월 '+rng.start.getDate()+'일 ~ '+(rng.end.getMonth()+1)+'월 '+rng.end.getDate()+'일';
+    var weekEntries=entries.filter(function(e){var d=new Date(e.ts);return d>=rng.start&&d<=rng.end;});
+    var sums=[0,0,0,0,0,0,0];weekEntries.forEach(function(e){(e.emos||[]).forEach(function(n){if(n>=1&&n<=7)sums[n-1]++;});});
+    var grid={};for(var d=0;d<7;d++){grid[d]={};for(var s=0;s<8;s++)grid[d][s]=[];}
+    weekEntries.forEach(function(e){var dt=new Date(e.ts);var dow=dt.getDay();var dayIdx=dow===0?6:dow-1;var slot=timeSlot(dt);if(slot>=0){(e.emos||[]).forEach(function(n){if(n>=1&&n<=7)grid[dayIdx][slot].push(n);});}});
+    var html='<table class="sumtable"><tr>';EMOTIONS.forEach(function(em){html+='<th>'+em.n+'. '+em.hanja+'<br>'+em.name+'</th>';});html+='</tr><tr>';sums.forEach(function(s){html+='<td>'+s+'</td>';});html+='</tr></table>';
+    var slots=['7-8','9-10','11-12','1-2','3-4','5-6','7-8','9-10'];var days=['월','화','수','목','금','토','일'];
+    html+='<table class="gridtable"><tr><th rowspan="2">일과</th><th colspan="3">오전</th><th colspan="5">오후</th></tr><tr>';slots.forEach(function(s){html+='<th>'+s+'</th>';});html+='</tr>';
+    for(var d=0;d<7;d++){html+='<tr><td class="day">'+days[d]+'</td>';for(var s=0;s<8;s++){var vals=grid[d][s];html+='<td'+(vals.length===0?' class="empty"':'')+'>'+(vals.length?vals.join(','):'·')+'</td>';}html+='</tr>';}
+    html+='</table>';document.getElementById('matrixBody').innerHTML=html;
+  }
+
+  // 모든 이벤트 바인딩을 DOM 준비 후 한 번에
+  function bindAll(){
+    document.getElementById('useCustom').addEventListener('change',toggleDate);
+    document.getElementById('btnAdd').addEventListener('click',addEntry);
+    document.getElementById('btnMatrix').addEventListener('click',openMatrix);
+    document.getElementById('btnExport').addEventListener('click',exportTxt);
+    document.getElementById('btnImport').addEventListener('click',importTxt);
+    document.getElementById('btnReset').addEventListener('click',resetSeed);
+    document.getElementById('btnCloseMatrix').addEventListener('click',closeMatrix);
+    document.querySelectorAll('.weekNav button').forEach(function(b){
+      b.addEventListener('click',function(){navWeek(parseInt(b.getAttribute('data-w')));});
+    });
+    document.getElementById('file').addEventListener('change',function(ev){
+      var f=ev.target.files[0];if(!f){return;}
+      var r=new FileReader();
+      r.onload=function(){
+        try{var txt=r.result;var i=txt.indexOf('[DATA]');
+          if(i>=0){var data=JSON.parse(txt.slice(i+6).trim());
+            if(Array.isArray(data)){var map={};entries.concat(data).forEach(function(e){map[e.id]=e;});entries=Object.keys(map).map(function(k){return map[k];});save();render();alert('불러왔어요 ('+entries.length+'편)');return;}}
+          alert('이 파일에서는 기록 데이터를 찾지 못했어요.');
+        }catch(e){alert('불러오기에 실패했어요: '+e.message);}
+      };
+      r.onerror=function(){alert('파일을 읽지 못했어요.');};
+      r.readAsText(f,'UTF-8');
+      ev.target.value='';
+    });
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',function(){renderEmoButtons();load();render();bindAll();tick();setInterval(tick,10000);});
+  }else{
+    renderEmoButtons();load();render();bindAll();tick();setInterval(tick,10000);
+  }
+})();
+</script>
+</body>
+</html>
