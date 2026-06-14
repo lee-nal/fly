@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>명상심리 7情 매트릭스</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a2e; --paper: #f5f0e8; --warm: #e8dcc8;
+    --accent: #7b6fa0; --accent2: #c17f5a; --light-accent: #ede8f5;
+    --row-alt: #f0ebe0; --border: #c8bfaa; --header-bg: #d4c9b5;
+    /* 7정 색상 (교재 기준, 연하게) */
+    --c1: #c8e6c9; --c1d: #2e7d32;   /* 怒 성냄 - 초록 */
+    --c2: #d1c4e9; --c2d: #6a1b9a;   /* 驚 놀람 - 보라 */
+    --c3: #f8bbd0; --c3d: #c2185b;   /* 喜 기쁨 - 분홍 */
+    --c4: #fff9c4; --c4d: #f57f17;   /* 思 생각 - 노랑 */
+    --c5: #fce4ec; --c5d: #e91e8c;   /* 憂 근심 - 연분홍 */
+    --c6: #cfd8dc; --c6d: #455a64;   /* 悲 슬픔 - 회색 */
+    --c7: #cfd8dc; --c7d: #212121;   /* 恐 두려움 - 검정 */
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans KR', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; padding: 0 0 40px; }
+
+  .page-title { font-family: 'Noto Serif KR', serif; font-size: 1.2rem; font-weight: 700; text-align: center; color: var(--accent); padding: 16px 12px 2px; }
+  .page-sub { text-align: center; font-size: 0.68rem; color: #888; margin-bottom: 10px; }
+
+  /* 탭 */
+  .tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); background: white; position: sticky; top: 0; z-index: 100; }
+  .tab-btn { flex: 1; padding: 10px 0; border: none; background: white; font-family: 'Noto Sans KR', sans-serif; font-size: 0.78rem; color: #888; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+  .tab-btn.active { color: var(--accent); font-weight: 700; border-bottom-color: var(--accent); }
+  .tab-panel { display: none; padding: 12px 12px 0; }
+  .tab-panel.active { display: block; }
+
+  /* 스티키 7정 범례 */
+  .legend-sticky {
+    position: sticky; top: 42px; z-index: 90;
+    background: white; border-bottom: 1px solid var(--border);
+    padding: 6px 12px; margin: 0 -12px;
+  }
+  .legend-hint { font-size: 0.6rem; color: #aaa; margin-bottom: 4px; }
+  .legend-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+  .legend-item { border-radius: 5px; padding: 3px 2px; text-align: center; }
+  .legend-num { font-size: 0.8rem; font-weight: 700; display: block; }
+  .legend-name { font-size: 0.55rem; display: block; }
+  .e1 { background: var(--c1); color: var(--c1d); }
+  .e2 { background: var(--c2); color: var(--c2d); }
+  .e3 { background: var(--c3); color: var(--c3d); }
+  .e4 { background: var(--c4); color: var(--c4d); }
+  .e5 { background: var(--c5); color: var(--c5d); }
+  .e6 { background: var(--c6); color: var(--c6d); }
+  .e7 { background: var(--c7); color: var(--c7d); }
+
+  /* 주차 네비 */
+  .week-nav { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 8px 12px; margin-bottom: 10px; margin-top: 10px; }
+  .week-nav-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+  .week-arrow { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--border); background: var(--paper); font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--accent); flex-shrink: 0; }
+  .week-arrow:active { background: var(--accent); color: white; border-color: var(--accent); }
+  .week-info { text-align: center; flex: 1; }
+  .week-year { font-size: 0.62rem; color: #bbb; }
+  .week-range { font-size: 0.95rem; font-weight: 700; color: var(--ink); }
+
+  /* 관찰 점수 */
+  .score-section { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; margin-bottom: 10px; }
+  .score-title { font-size: 0.65rem; color: #999; margin-bottom: 6px; }
+  .score-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+  .score-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .score-label { font-size: 0.52rem; font-weight: 700; text-align: center; }
+  .score-auto { width: 100%; height: 28px; border: 1.5px solid; border-radius: 6px; font-size: 0.9rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .score-auto.zero { border-color: var(--border) !important; color: #ccc !important; background: #f9f7f4 !important; }
+  .score-bar-wrap { width: 100%; height: 3px; background: var(--warm); border-radius: 2px; overflow: hidden; }
+  .score-bar { height: 100%; border-radius: 2px; transition: width 0.4s ease; }
+  /* 각 감정별 색 */
+  .si1 .score-label{color:var(--c1d)} .si1 .score-auto{background:var(--c1);border-color:var(--c1d);color:var(--c1d)} .si1 .score-bar{background:var(--c1d)}
+  .si2 .score-label{color:var(--c2d)} .si2 .score-auto{background:var(--c2);border-color:var(--c2d);color:var(--c2d)} .si2 .score-bar{background:var(--c2d)}
+  .si3 .score-label{color:var(--c3d)} .si3 .score-auto{background:var(--c3);border-color:var(--c3d);color:var(--c3d)} .si3 .score-bar{background:var(--c3d)}
+  .si4 .score-label{color:var(--c4d)} .si4 .score-auto{background:var(--c4);border-color:var(--c4d);color:var(--c4d)} .si4 .score-bar{background:var(--c4d)}
+  .si5 .score-label{color:var(--c5d)} .si5 .score-auto{background:var(--c5);border-color:var(--c5d);color:var(--c5d)} .si5 .score-bar{background:var(--c5d)}
+  .si6 .score-label{color:var(--c6d)} .si6 .score-auto{background:var(--c6);border-color:var(--c6d);color:var(--c6d)} .si6 .score-bar{background:var(--c6d)}
+  .si7 .score-label{color:var(--c7d)} .si7 .score-auto{background:var(--c7);border-color:var(--c7d);color:var(--c7d)} .si7 .score-bar{background:var(--c7d)}
+
+  /* 매트릭스 */
+  .matrix-section { background: white; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
+  .matrix-hint { font-size: 0.62rem; color: #bbb; padding: 6px 10px 2px; }
+  .matrix-table { width: 100%; border-collapse: collapse; }
+  .matrix-table th, .matrix-table td { border: 1px solid var(--border); text-align: center; font-size: 0.68rem; }
+  .time-header { background: var(--header-bg); font-weight: 700; font-size: 0.6rem; padding: 4px 1px; color: #444; }
+  .day-cell { background: var(--header-bg); font-weight: 700; font-size: 0.7rem; padding: 3px 4px; color: #444; line-height: 1.4; white-space: nowrap; }
+  .data-input { width: 100%; height: 30px; border: none; text-align: center; font-size: 0.82rem; font-family: 'Noto Sans KR', sans-serif; background: transparent; color: var(--ink); font-weight: 500; }
+  .data-input:focus { outline: none; background: #f0ebff; }
+  tr:nth-child(even) td:not(.day-cell) { background: var(--row-alt); }
+  tr:nth-child(even) .data-input { background: transparent; }
+  /* 입력값별 색상 */
+  .data-input[data-v="1"] { color: var(--c1d); font-weight: 700; }
+  .data-input[data-v="2"] { color: var(--c2d); font-weight: 700; }
+  .data-input[data-v="3"] { color: var(--c3d); font-weight: 700; }
+  .data-input[data-v="4"] { color: var(--c4d); font-weight: 700; }
+  .data-input[data-v="5"] { color: var(--c5d); font-weight: 700; }
+  .data-input[data-v="6"] { color: var(--c6d); font-weight: 700; }
+  .data-input[data-v="7"] { color: var(--c7d); font-weight: 700; }
+
+  /* 빈도 탭 */
+  .freq-card { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
+  .freq-card-title { font-size: 0.75rem; font-weight: 700; color: var(--accent); margin-bottom: 10px; }
+  .period-row { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+  .period-label { font-size: 0.7rem; color: #888; white-space: nowrap; }
+  .period-input { height: 30px; border: 1.5px solid var(--border); border-radius: 7px; padding: 0 6px; font-size: 0.75rem; font-family: 'Noto Sans KR', sans-serif; color: var(--ink); background: var(--paper); flex: 1; min-width: 100px; }
+  .period-btn { padding: 6px 12px; border-radius: 7px; border: none; background: var(--accent); color: white; font-family: 'Noto Sans KR', sans-serif; font-size: 0.75rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+  .week-preset-row { display: flex; gap: 5px; margin-bottom: 10px; flex-wrap: wrap; }
+  .preset-btn { padding: 5px 10px; border-radius: 15px; border: 1.5px solid var(--border); background: white; font-family: 'Noto Sans KR', sans-serif; font-size: 0.7rem; color: #666; cursor: pointer; }
+  .preset-btn.active { background: var(--accent); border-color: var(--accent); color: white; font-weight: 700; }
+  .freq-bar-wrap { display: flex; flex-direction: column; gap: 6px; }
+  .freq-row { display: flex; align-items: center; gap: 6px; }
+  .freq-label { width: 48px; font-size: 0.65rem; text-align: right; flex-shrink: 0; }
+  .freq-bar-bg { flex: 1; height: 22px; background: var(--warm); border-radius: 4px; overflow: hidden; }
+  .freq-bar { height: 100%; border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding-right: 5px; font-size: 0.62rem; color: white; font-weight: 700; transition: width 0.5s ease; min-width: 2px; }
+  .freq-count { width: 20px; font-size: 0.72rem; font-weight: 700; text-align: left; flex-shrink: 0; }
+
+  .btn-row { display: flex; gap: 8px; margin-top: 4px; padding-bottom: 4px; }
+  .btn { flex: 1; padding: 10px; border-radius: 10px; border: none; font-family: 'Noto Sans KR', sans-serif; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-secondary { background: white; color: var(--accent); border: 1.5px solid var(--accent); }
+  .btn-danger { background: white; color: #e05555; border: 1.5px solid #e05555; }
+
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--ink); color: white; padding: 10px 20px; border-radius: 20px; font-size: 0.78rem; opacity: 0; transition: all 0.3s; pointer-events: none; white-space: nowrap; z-index: 999; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .name-section { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 9px 12px; margin: 10px 0; display: flex; align-items: center; gap: 8px; }
+  .name-label { font-size: 0.75rem; color: var(--accent); font-weight: 700; white-space: nowrap; }
+  .name-input { flex: 1; height: 32px; border: 1.5px solid var(--border); border-radius: 8px; padding: 0 10px; font-size: 0.9rem; font-family: "Noto Sans KR", sans-serif; color: var(--ink); background: var(--paper); }
+  .name-input:focus { outline: none; border-color: var(--accent); }
+  .pdf-btn { width: 100%; padding: 11px; border-radius: 10px; border: none; background: #455a64; color: white; font-family: "Noto Sans KR", sans-serif; font-size: 0.82rem; font-weight: 700; cursor: pointer; margin: 8px 0 12px; }
+  .pdf-btn:active { background: #263238; }
+  .print-header { display: none; }
+  @media print {
+    html, body { background: white !important; padding: 0 !important; margin: 0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; height: auto !important; min-height: 0 !important; }
+    .tabs, #tab-record, #tab-guide, .toast, .pdf-btn, .week-preset-row, #custom-range, .period-btn, .freq-card-title + div > button { display: none !important; }
+    #tab-freq { display: block !important; padding: 0 !important; margin: 0 !important; }
+    .freq-card { border: 1px solid #ccc !important; margin-bottom: 4mm !important; padding: 8px !important; page-break-inside: avoid !important; break-inside: avoid !important; }
+    .freq-card:last-of-type { margin-bottom: 0 !important; }
+    .print-header { display: block !important; text-align: center; margin-bottom: 5mm; border-bottom: 2px solid #7b6fa0; padding-bottom: 3mm; }
+    .print-header h2 { font-size: 1rem; color: #333; }
+    .print-header p { font-size: 0.75rem; color: #666; margin-top: 2px; }
+    @page { size: A4 portrait; margin: 12mm; }
+  }
+</style>
+</head>
+<body>
+
+<h1 class="page-title">명상심리 7情 매트릭스</h1>
+<p class="page-sub">관찰명상법(meditation observation dharma)</p>
+
+<!-- 탭 (sticky) -->
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('record',this)">📝 기록</button>
+  <button class="tab-btn" onclick="switchTab('freq',this)">📊 빈도</button>
+  <button class="tab-btn" onclick="switchTab('guide',this)">💡 안내</button>
+</div>
+
+<!-- TAB 1: 기록 -->
+<div id="tab-record" class="tab-panel active">
+
+  <!-- 스티키 7정 범례 -->
+  <div class="legend-sticky">
+    <div class="legend-hint">해당 번호를 매트릭스에 입력 · 해당 시간 나를 가장 이끈 감정은?</div>
+    <div class="legend-grid">
+      <div class="legend-item e1"><span class="legend-num">1</span><span class="legend-name">怒 성냄</span></div>
+      <div class="legend-item e2"><span class="legend-num">2</span><span class="legend-name">驚 놀람</span></div>
+      <div class="legend-item e3"><span class="legend-num">3</span><span class="legend-name">喜 기쁨</span></div>
+      <div class="legend-item e4"><span class="legend-num">4</span><span class="legend-name">思 생각</span></div>
+      <div class="legend-item e5"><span class="legend-num">5</span><span class="legend-name">憂 근심</span></div>
+      <div class="legend-item e6"><span class="legend-num">6</span><span class="legend-name">悲 슬픔</span></div>
+      <div class="legend-item e7"><span class="legend-num">7</span><span class="legend-name">恐 두려움</span></div>
+    </div>
+  </div>
+
+  <!-- 이름 입력 -->
+  <div class="name-section">
+    <span class="name-label">👤 이름</span>
+    <input class="name-input" type="text" id="user-name" placeholder="이름을 입력하세요" oninput="saveName()">
+  </div>
+
+  <!-- 주차 네비 -->
+  <div class="week-nav">
+    <div class="week-nav-row">
+      <button class="week-arrow" onclick="changeWeek(-1)">‹</button>
+      <div class="week-info">
+        <div class="week-year" id="week-year"></div>
+        <div class="week-range" id="week-range">—</div>
+      </div>
+      <button class="week-arrow" onclick="changeWeek(1)">›</button>
+    </div>
+  </div>
+
+  <!-- 관찰 점수 -->
+  <div class="score-section">
+    <div class="score-title">📌 관찰 점수 — 자동 집계</div>
+    <div class="score-grid">
+      <div class="score-item si1"><span class="score-label">1 성냄</span><div class="score-auto zero" id="s1">—</div><div class="score-bar-wrap"><div class="score-bar" id="sb1" style="width:0%"></div></div></div>
+      <div class="score-item si2"><span class="score-label">2 놀람</span><div class="score-auto zero" id="s2">—</div><div class="score-bar-wrap"><div class="score-bar" id="sb2" style="width:0%"></div></div></div>
+      <div class="score-item si3"><span class="score-label">3 기쁨</span><div class="score-auto zero" id="s3">—</div><div class="score-bar-wrap"><div class="score-bar" id="sb3" style="width:0%"></div></div></div>
+      <div class="score-item si4"><span class="score-label">4 생각</span><div class="score-auto zero" id="s4">—</div><div class="score-bar-wrap"><div class="score-bar" id="sb4" style="width:0%"></div></div></div>
+      <div class="score-item si5"><span class="score-label">5 근심</span><div class="score-auto zero" id="s5">—</div><div class="score-bar-wrap"><div class="score-bar" id="sb5" style="width:0%"></div></div></div>
+      <div class="score-item si6"><span class="score-label">6 슬픔</span><div class="score-auto zero" id="s6">—</div><div class="score-bar-wrap"><div class="score-bar" id="sb6" style="width:0%"></div></div></div>
+      <div class="score-item si7"><span class="score-label">7 두려움</span><div class="score-auto zero" id="s7">—</div><div class="score-bar-wrap"><div class="score-bar" id="sb7" style="width:0%"></div></div></div>
+    </div>
+  </div>
+
+  <!-- 매트릭스 -->
+  <div class="matrix-section">
+    <div class="matrix-hint">◎ 해당 시간 나를 가장 이끈 감정 번호를 선택하세요</div>
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th class="time-header">시간</th>
+          <th class="time-header" colspan="3">오 전</th>
+          <th class="time-header" colspan="5">오 후</th>
+        </tr>
+        <tr>
+          <th class="time-header">일과</th>
+          <th class="time-header">6-8</th>
+          <th class="time-header">8-10</th>
+          <th class="time-header">10-12</th>
+          <th class="time-header">12-14</th>
+          <th class="time-header">14-16</th>
+          <th class="time-header">16-18</th>
+          <th class="time-header">18-20</th>
+          <th class="time-header">20-22</th>
+        </tr>
+      </thead>
+      <tbody id="matrix-body"></tbody>
+    </table>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="saveData()">💾 저장</button>
+    <button class="btn btn-secondary" onclick="loadSample()">예시</button>
+    <button class="btn btn-danger" onclick="clearWeek()">초기화</button>
+  </div>
+</div>
+
+<!-- TAB 2: 빈도 -->
+<div id="tab-freq" class="tab-panel">
+
+  <!-- 인쇄시 보이는 헤더 -->
+  <div class="print-header">
+    <h2>명상심리 7情 매트릭스 — 감정 빈도 분석</h2>
+    <p id="print-name-date"></p>
+  </div>
+
+  <div class="freq-card">
+    <div class="freq-card-title">📊 기간 설정</div>
+    <!-- 프리셋 -->
+    <div class="week-preset-row">
+      <button class="preset-btn active" id="preset-this" onclick="setPreset('this')">이번 주</button>
+      <button class="preset-btn" id="preset-last" onclick="setPreset('last')">지난 주</button>
+      <button class="preset-btn" id="preset-month" onclick="setPreset('month')">이번 달</button>
+      <button class="preset-btn" id="preset-custom" onclick="setPreset('custom')">직접 설정</button>
+    </div>
+    <!-- 직접 설정 (기본 숨김) -->
+    <div id="custom-range" style="display:none">
+      <div class="period-row">
+        <span class="period-label">시작</span>
+        <input class="period-input" type="date" id="freq-start">
+        <span class="period-label">종료</span>
+        <input class="period-input" type="date" id="freq-end">
+      </div>
+      <button class="period-btn" onclick="renderFreq()">조회</button>
+    </div>
+    <div id="freq-period-label" style="font-size:0.68rem;color:#aaa;margin-top:6px;margin-bottom:2px;"></div>
+  </div>
+
+  <div class="freq-card">
+    <div class="freq-card-title" id="freq-title">감정 빈도</div>
+    <div class="freq-bar-wrap" id="freq-bars"></div>
+  </div>
+
+  <div class="freq-card">
+    <div class="freq-card-title">감정별 집계표</div>
+    <div id="freq-table-wrap"></div>
+  </div>
+
+  <button class="pdf-btn" onclick="printPDF()">🖨️ PDF로 저장 / 인쇄</button>
+</div>
+
+<!-- TAB 3: 안내 -->
+<div id="tab-guide" class="tab-panel">
+  <div class="score-section" style="margin-top:10px">
+    <div class="score-title" style="font-size:0.85rem;font-weight:700;color:var(--accent);margin-bottom:10px;">사용 방법</div>
+    <p style="font-size:0.78rem;line-height:1.9;color:#444;">
+      1. ‹ › 버튼으로 주차를 이동하세요.<br>
+      2. <b>해당 시간 나를 가장 이끈 감정</b>의 번호(1~7)를 입력하세요.<br>
+      3. 입력하면 자동으로 저장돼요.<br>
+      4. 주차를 넘기면 그 주 데이터가 자동으로 표시돼요.<br>
+      5. 빈도 탭에서 주간·월간·기간별 감정 패턴을 확인하세요.<br><br>
+      <b>7정 순서 (교재 기준)</b><br>
+      1怒 성냄 · 2驚 놀람 · 3喜 기쁨 · 4思 생각<br>
+      5憂 근심 · 6悲 슬픔 · 7恐 두려움
+    </p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DAYS  = ['월','화','수','목','금','토','일'];
+const SLOTS = 8;
+const EMOTIONS = [
+  {name:'怒 성냄', short:'성냄', bg:'var(--c1)', dark:'var(--c1d)'},
+  {name:'驚 놀람', short:'놀람', bg:'var(--c2)', dark:'var(--c2d)'},
+  {name:'喜 기쁨', short:'기쁨', bg:'var(--c3)', dark:'var(--c3d)'},
+  {name:'思 생각', short:'생각', bg:'var(--c4)', dark:'var(--c4d)'},
+  {name:'憂 근심', short:'근심', bg:'var(--c5)', dark:'var(--c5d)'},
+  {name:'悲 슬픔', short:'슬픔', bg:'var(--c6)', dark:'var(--c6d)'},
+  {name:'恐 두려움',short:'두려움',bg:'var(--c7)', dark:'var(--c7d)'},
+];
+const STORE_KEY = 'jungAll';
+const OLD_KEY   = '7jung_matrix';
+const SAMPLE = {
+  월:[null,null,null,null,null,null,null,null],
+  화:[null,null,null,null,null,null,null,null],
+  수:[null,null,null,null,null,null,null,null],
+  목:[1,1,4,1,3,2,1,1],
+  금:[1,1,1,4,null,null,null,null],
+  토:[null,null,null,null,null,null,null,null],
+  일:[null,null,null,null,null,null,null,null]
+};
+
+let allData = {};
+let curMonday = getThisMonday(new Date());
+let freqPreset = 'this';
+
+/* ── 매트릭스 행 생성 ── */
+const tbody = document.getElementById('matrix-body');
+DAYS.forEach(day => {
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td class="day-cell" id="label_${day}">${day}</td>` +
+    Array.from({length:SLOTS},(_,i) =>
+      `<td style="padding:0"><input class="data-input" id="d_${day}_${i}" type="number" min="1" max="7" oninput="onInput(this)"></td>`
+    ).join('');
+  tbody.appendChild(tr);
+});
+
+/* ── 날짜 유틸 ── */
+function getThisMonday(date) {
+  const y=date.getFullYear(), m=date.getMonth(), dd=date.getDate();
+  const tmp=new Date(y,m,dd);
+  const day=tmp.getDay();
+  const diff=day===0?-6:1-day;
+  return new Date(y,m,dd+diff);
+}
+function toKey(date) {
+  const y=date.getFullYear();
+  const m=String(date.getMonth()+1).padStart(2,'0');
+  const d=String(date.getDate()).padStart(2,'0');
+  return `${y}-${m}-${d}`;
+}
+function addWeeks(date,n) {
+  return new Date(date.getFullYear(),date.getMonth(),date.getDate()+n*7);
+}
+function addDays(date,n) {
+  return new Date(date.getFullYear(),date.getMonth(),date.getDate()+n);
+}
+function fmtDate(date) { return `${date.getFullYear()}.${date.getMonth()+1}.${date.getDate()}`; }
+function fmtShort(date) { return `${date.getMonth()+1}/${date.getDate()}`; }
+
+/* ── 저장 ── */
+function persist() { localStorage.setItem(STORE_KEY, JSON.stringify(allData)); }
+
+function emptyMatrix() {
+  const m={};
+  DAYS.forEach(d=>{m[d]=Array(SLOTS).fill(null);});
+  return m;
+}
+
+function loadAll() {
+  try { allData=JSON.parse(localStorage.getItem(STORE_KEY))||{}; } catch(e){ allData={}; }
+  // 구버전 마이그레이션
+  try {
+    const old=localStorage.getItem(OLD_KEY);
+    if(old){
+      const p=JSON.parse(old);
+      if(p.matrix&&p.startDate&&!allData[p.startDate]){
+        allData[p.startDate]=p.matrix;
+        persist();
+        curMonday=new Date(p.startDate.replace(/-/g,'/'));
+        showToast('이전 기록을 복구했어요 ✅');
+      }
+    }
+  } catch(e){}
+
+  loadName();
+  renderAll();
+}
+
+/* ── 주차 이동 ── */
+function changeWeek(dir) {
+  saveCurrentMatrix(true);
+  curMonday=addWeeks(curMonday,dir);
+  renderAll();
+}
+
+/* ── 렌더링 ── */
+function renderAll() {
+  const key=toKey(curMonday);
+  const end=addDays(curMonday,6);
+  document.getElementById('week-year').textContent=curMonday.getFullYear()+'년';
+  document.getElementById('week-range').textContent=`${fmtShort(curMonday)} ~ ${fmtShort(end)}`;
+
+  DAYS.forEach((day,i)=>{
+    const d=addDays(curMonday,i);
+    document.getElementById(`label_${day}`).innerHTML=
+      `${day}<br><span style="font-size:0.56rem;font-weight:400;color:#999">${d.getMonth()+1}/${d.getDate()}</span>`;
+  });
+
+  const matrix=allData[key]||emptyMatrix();
+  DAYS.forEach(day=>{
+    (matrix[day]||[]).forEach((v,i)=>{
+      const el=document.getElementById(`d_${day}_${i}`);
+      if(el){ el.value=(v!=null)?v:''; colorInput(el); }
+    });
+  });
+  updateScores();
+}
+
+function colorInput(el) {
+  const v=el.value;
+  el.setAttribute('data-v', v||'');
+}
+
+function emptyMatrix() {
+  const m={};DAYS.forEach(d=>{m[d]=Array(SLOTS).fill(null);});return m;
+}
+
+/* ── 입력 ── */
+function onInput(el) {
+  // 1~7만 허용
+  if(el.value && (parseInt(el.value)<1||parseInt(el.value)>7)) { el.value=''; }
+  colorInput(el);
+  updateScores();
+  saveCurrentMatrix(true);
+}
+
+function saveCurrentMatrix(silent) {
+  const key=toKey(curMonday);
+  const m={};
+  DAYS.forEach(day=>{
+    m[day]=Array.from({length:SLOTS},(_,i)=>{
+      const v=document.getElementById(`d_${day}_${i}`).value;
+      return v?parseInt(v):null;
+    });
+  });
+  allData[key]=m;
+  persist();
+  if(!silent) showToast('✅ 저장됐어요!');
+}
+
+function saveData(){ saveCurrentMatrix(false); }
+
+function loadSample() {
+  DAYS.forEach(day=>{
+    (SAMPLE[day]||[]).forEach((v,i)=>{
+      const el=document.getElementById(`d_${day}_${i}`);
+      if(el){ el.value=v||''; colorInput(el); }
+    });
+  });
+  saveCurrentMatrix(true);
+  updateScores();
+  showToast('예시 데이터를 불러왔어요');
+}
+
+function clearWeek() {
+  if(!confirm('이 주차 기록을 모두 지울까요?')) return;
+  DAYS.forEach(day=>{
+    Array.from({length:SLOTS},(_,i)=>{
+      const el=document.getElementById(`d_${day}_${i}`);
+      if(el){ el.value=''; colorInput(el); }
+    });
+  });
+  delete allData[toKey(curMonday)];
+  persist();
+  updateScores();
+  showToast('초기화됐어요');
+}
+
+/* ── 점수 집계 ── */
+function updateScores() {
+  const counts=Array(8).fill(0);
+  DAYS.forEach(day=>{
+    Array.from({length:SLOTS},(_,i)=>{
+      const v=parseInt(document.getElementById(`d_${day}_${i}`).value);
+      if(v>=1&&v<=7) counts[v]++;
+    });
+  });
+  const max=Math.max(...counts.slice(1),1);
+  for(let i=1;i<=7;i++){
+    const el=document.getElementById(`s${i}`), bar=document.getElementById(`sb${i}`);
+    if(counts[i]>0){
+      el.textContent=counts[i]; el.classList.remove('zero');
+      bar.style.width=Math.round(counts[i]/max*100)+'%';
+    } else {
+      el.textContent='—'; el.classList.add('zero'); bar.style.width='0%';
+    }
+  }
+}
+
+/* ── 탭 ── */
+function switchTab(name,btn) {
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='freq') renderFreq();
+}
+
+/* ── 빈도 탭 ── */
+function setPreset(p) {
+  freqPreset=p;
+  document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('preset-'+p).classList.add('active');
+  document.getElementById('custom-range').style.display=(p==='custom'?'block':'none');
+  if(p!=='custom') renderFreq();
+}
+
+function getFreqRange() {
+  const today=new Date();
+  if(freqPreset==='this') {
+    const mon=getThisMonday(today);
+    return {start:mon, end:addDays(mon,6)};
+  } else if(freqPreset==='last') {
+    const mon=addWeeks(getThisMonday(today),-1);
+    return {start:mon, end:addDays(mon,6)};
+  } else if(freqPreset==='month') {
+    const start=new Date(today.getFullYear(),today.getMonth(),1);
+    const end=new Date(today.getFullYear(),today.getMonth()+1,0);
+    return {start,end};
+  } else {
+    const s=document.getElementById('freq-start').value;
+    const e=document.getElementById('freq-end').value;
+    if(!s||!e){ showToast('시작일과 종료일을 선택해주세요'); return null; }
+    return {start:new Date(s.replace(/-/g,'/')), end:new Date(e.replace(/-/g,'/'))};
+  }
+}
+
+function renderFreq() {
+  const range=getFreqRange();
+  if(!range) return;
+  const {start,end}=range;
+
+  document.getElementById('freq-period-label').textContent=
+    `📅 ${fmtDate(start)} ~ ${fmtDate(end)}`;
+
+  // 해당 기간의 모든 날짜 키 수집
+  const counts=Array(8).fill(0); let total=0;
+  let d=new Date(start);
+  while(d<=end) {
+    const mon=getThisMonday(d);
+    const key=toKey(mon);
+    const matrix=allData[key];
+    if(matrix) {
+      // 해당 날짜가 무슨 요일인지
+      const dayIdx=d.getDay()===0?6:d.getDay()-1;
+      const dayName=DAYS[dayIdx];
+      (matrix[dayName]||[]).forEach(v=>{
+        if(v>=1&&v<=7){counts[v]++;total++;}
+      });
+    }
+    d=addDays(d,1);
+  }
+
+  const max=Math.max(...counts.slice(1),1);
+  const barsEl=document.getElementById('freq-bars');
+  barsEl.innerHTML='';
+  for(let i=1;i<=7;i++){
+    const pct=Math.round(counts[i]/max*100);
+    const em=EMOTIONS[i-1];
+    barsEl.innerHTML+=`<div class="freq-row">
+      <div class="freq-label" style="color:${em.dark}">${i}. ${em.short}</div>
+      <div class="freq-bar-bg"><div class="freq-bar" style="width:${pct}%;background:${em.dark}">${counts[i]>0?counts[i]:''}</div></div>
+      <div class="freq-count" style="color:${em.dark}">${counts[i]}</div>
+    </div>`;
+  }
+
+  const sorted=counts.slice(1).map((c,i)=>({n:i+1,c})).sort((a,b)=>b.c-a.c);
+  document.getElementById('freq-table-wrap').innerHTML=`
+    <table style="width:100%;border-collapse:collapse;font-size:0.75rem;">
+      <tr style="background:var(--header-bg)">
+        <th style="border:1px solid var(--border);padding:5px;text-align:center">순위</th>
+        <th style="border:1px solid var(--border);padding:5px;text-align:center">감정</th>
+        <th style="border:1px solid var(--border);padding:5px;text-align:center">횟수</th>
+        <th style="border:1px solid var(--border);padding:5px;text-align:center">비율</th>
+      </tr>
+      ${sorted.map((item,idx)=>{
+        const em=EMOTIONS[item.n-1];
+        return `<tr style="background:${em.bg}">
+          <td style="border:1px solid var(--border);padding:5px;text-align:center;font-weight:700;color:${em.dark}">${idx+1}</td>
+          <td style="border:1px solid var(--border);padding:5px;text-align:center;color:${em.dark};font-weight:700">${item.n}. ${em.name}</td>
+          <td style="border:1px solid var(--border);padding:5px;text-align:center;font-weight:700">${item.c}</td>
+          <td style="border:1px solid var(--border);padding:5px;text-align:center">${total?Math.round(item.c/total*100):0}%</td>
+        </tr>`;
+      }).join('')}
+    </table>`;
+}
+
+function saveName() {
+  const name = document.getElementById('user-name').value;
+  localStorage.setItem('jungUserName', name);
+}
+
+function loadName() {
+  const name = localStorage.getItem('jungUserName') || '';
+  document.getElementById('user-name').value = name;
+}
+
+function printPDF() {
+  // 인쇄 헤더에 이름·날짜 채우기
+  const name = document.getElementById('user-name').value || '이름 미입력';
+  const range = document.getElementById('freq-period-label').textContent || '';
+  document.getElementById('print-name-date').textContent = `이름: ${name}  |  ${range}  |  출력일: ${fmtDate(new Date())}`;
+  window.print();
+}
+
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+window.onload=loadAll;
+</script>
+</body>
+</html>
